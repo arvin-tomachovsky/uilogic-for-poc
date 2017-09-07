@@ -28,10 +28,28 @@ public class WmsTaskConverter {
 
 		Task result = new Task();
 
-		result.setId(wmsTask.getTaskID());
-		result.setClient(wmsTask.getTaskInfo().getCreatedBy());
-		result.setStatus(wmsTask.getTaskInfo().getStatus());
+		result.setId(wmsTask.getTaskId());
+		if (wmsTask.getTaskData() != null) {
+			if (wmsTask.getTaskData().getDeadline() != null) {
+				result.setClient(wmsTask.getTaskData().getDeadline());
+			} else {
+				result.setClient("Brak");
+			}
+		} else {
+			result.setClient("TEMP");
+		}
+		if ("active".equals(wmsTask.getTaskInfo().getStatus())) {
+			result.setStatus("Aktywne");
+		} else if ("completed".equals(wmsTask.getTaskInfo().getStatus())) {
+			result.setStatus("Zakończone");
+		} else {
+			result.setStatus(wmsTask.getTaskInfo().getStatus());
+		}
 		result.setTitle(wmsTask.getTaskInfo().getName());
+
+		result.setUrgent(Math.random() < 0.5);
+		result.setMyTask(Math.random() < 0.5);
+		result.setRecurring(Math.random() < 0.5);
 
 		try {
 

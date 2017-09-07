@@ -1,6 +1,8 @@
 package ca.poc.uilogic.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -10,10 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import ca.poc.uilogic.converters.wms.WmsTaskConverter;
@@ -56,16 +55,18 @@ public class TasksService implements ITasksService {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("Authorization", "Basic QWRtaW5pc3RyYXRvcjptYW5hZ2U=");
 
-			MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
-			map.add("includeTaskData", "true");
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("includeTaskData", "true");
 
-			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+			HttpEntity<Map<String, String>> request = new HttpEntity<Map<String, String>>(map, headers);
 
-			ResponseEntity<WmsTasksList> result = restTemplate.postForEntity(wmsUrl, request , WmsTasksList.class);
+			WmsTasksList result2 = restTemplate.postForObject(wmsUrl, request, WmsTasksList.class);
 
-			if (result != null) {
-				for (WmsTask wmsTask : result.getBody().getTasksList()) {
-					tasksRepository.addTask(WmsTaskConverter.convert(wmsTask));
+			if (result2 != null) {
+				for (WmsTask wmsTask : result2.getTasksList()) {
+					if (wmsTask != null && wmsTask.getTaskInfo() != null && wmsTask.getTaskInfo().getName() != null && wmsTask.getTaskInfo().getName().length() > 0) {
+						tasksRepository.addTask(WmsTaskConverter.convert(wmsTask));
+					}
 				}
 			}
 

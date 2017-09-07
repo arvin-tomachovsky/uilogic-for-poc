@@ -10,20 +10,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class WmsTask {
 
 	@JsonProperty("TaskID")
-	private String TaskID;
+	private String taskId;
 
 	@JsonProperty("TaskInfo")
-	private WmsTaskInfo TaskInfo;
+	private WmsTaskInfo taskInfo;
 
 	@JsonProperty("TaskData")
-	private WmsTaskData TaskData;
+	private WmsTaskData taskData;
 
 	public WmsTask() {
 	}
 
 	@Override
 	public int hashCode() {
-		return (int) (Long.parseLong(TaskID) ^ (Long.parseLong(TaskID) >>> 32));
+		return (int) (Long.parseLong(taskId) ^ (Long.parseLong(taskId) >>> 32));
 	}
 
 	@Override
@@ -38,32 +38,32 @@ public class WmsTask {
 
 		WmsTask task = (WmsTask) param;
 
-		return TaskID.equals(task.TaskID);
+		return taskId.equals(task.taskId);
 	}
 
 	// GETTERS AND SETTERS
 
-	public String getTaskID() {
-		return TaskID;
+	public String getTaskId() {
+		return taskId;
 	}
 
-	public void setTaskID(String taskID) {
-		TaskID = taskID;
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
 	}
 
 	public WmsTaskInfo getTaskInfo() {
-		return TaskInfo;
+		return taskInfo;
 	}
 
 	public void setTaskInfo(WmsTaskInfo taskInfo) {
-		TaskInfo = taskInfo;
+		this.taskInfo = taskInfo;
 	}
-	
+
 	public WmsTaskData getTaskData() {
-		return TaskData;
+		return taskData;
 	}
 
 	public void setTaskData(WmsTaskData taskData) {
-		TaskData = taskData;
+		this.taskData = taskData;
 	}
 }

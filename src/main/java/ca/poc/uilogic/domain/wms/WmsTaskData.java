@@ -9,8 +9,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class WmsTaskData {
 
-	@JsonProperty("description")
+	@JsonProperty("Description")
 	private String description;
+
+	@JsonProperty("Deadline")
+	private String deadline;
 
 	public WmsTaskData() {
 	}
@@ -23,5 +26,13 @@ public class WmsTaskData {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(String deadline) {
+		this.deadline = deadline;
 	}
 }
