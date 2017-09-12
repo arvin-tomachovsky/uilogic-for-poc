@@ -9,8 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class WmsTaskInfo {
 
+	@JsonProperty("taskTypeID")
+	private String taskTypeID;
+
 	@JsonProperty("name")
 	private String name;
+
+	@JsonProperty("priority")
+	private String priority;
 
 	@JsonProperty("expireDate")
 	private String expireDate;
@@ -24,10 +30,29 @@ public class WmsTaskInfo {
 	@JsonProperty("createdBy")
 	private String createdBy;
 
+	@JsonProperty("assignedToList")
+	private String[] assignedToList;
+
 	public WmsTaskInfo() {
 	}
 
 	// GETTERS AND SETTERS
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+	
+	public String getTaskTypeID() {
+		return taskTypeID;
+	}
+
+	public void setTaskTypeID(String taskTypeID) {
+		this.taskTypeID = taskTypeID;
+	}
 
 	public String getExpireDate() {
 		return expireDate;
@@ -52,7 +77,7 @@ public class WmsTaskInfo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -60,12 +85,20 @@ public class WmsTaskInfo {
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
-	
+
 	public String getStatus() {
 		return status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String[] getAssignedToList() {
+		return assignedToList;
+	}
+
+	public void setAssignedToList(String[] assignedToList) {
+		this.assignedToList = assignedToList;
 	}
 }

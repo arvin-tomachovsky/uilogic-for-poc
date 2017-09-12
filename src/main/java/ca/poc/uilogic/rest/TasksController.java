@@ -45,41 +45,55 @@ public class TasksController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getAllTasks() {
 		logger.debug("Rest controller has received request to get all tasks");
-		return tasksService.getAllTasks();
+		return tasksService.getAllTasks(null);
 	}
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/all/{user}", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
-	public Task getTask(@PathVariable("id") String id) {
-		logger.debug("Rest controller has received request to get task with id: " + id);
-		return tasksService.getTask(id);
+	public List<Task> getAllTasks(@PathVariable("user") String user) {
+		logger.debug("Rest controller has received request to get all tasks for given user");
+		return tasksService.getAllTasks(user);
+	}
+
+	@RequestMapping(value = "/{taskId}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	public Task getTask(@PathVariable("taskId") String taskId) {
+		logger.debug("Rest controller has received request to get task with id: " + taskId);
+		return tasksService.getTask(taskId);
 	}
 
 	@RequestMapping(value = "/urgent", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getUrgentTasks() {
 		logger.debug("Rest controller has received request to get urgent tasks");
-		return tasksService.getAllTasks();
+		return tasksService.getAllTasks(null);
 	}
 
 	@RequestMapping(value = "/expring", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getExpiringTasks() {
 		logger.debug("Rest controller has received request to get expiring tasks");
-		return tasksService.getAllTasks();
+		return tasksService.getAllTasks(null);
 	}
 
 	@RequestMapping(value = "/cyclical", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getCyclicalTasks() {
 		logger.debug("Rest controller has received request to get cyclical tasks");
-		return tasksService.getAllTasks();
+		return tasksService.getAllTasks(null);
 	}
 
 	@RequestMapping(value = "/own", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getOwnTasks() {
 		logger.debug("Rest controller has received request to get own tasks");
-		return tasksService.getAllTasks();
+		return tasksService.getAllTasks(null);
+	}
+
+	@RequestMapping(value = "/update/{taskId}/{operator}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	public void reassignTask(@PathVariable("taskId") String taskId, @PathVariable("operator") String operator) {
+		logger.debug("Rest controller has received request to update task");
+		tasksService.updateTaskOwner(taskId, operator);
 	}
 }

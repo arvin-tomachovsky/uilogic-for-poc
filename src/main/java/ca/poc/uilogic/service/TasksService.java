@@ -1,5 +1,6 @@
 package ca.poc.uilogic.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +12,16 @@ import javax.inject.Named;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import ca.poc.uilogic.converters.wms.WmsTaskConverter;
 import ca.poc.uilogic.domain.Task;
 import ca.poc.uilogic.domain.wms.WmsTask;
+import ca.poc.uilogic.domain.wms.WmsTaskInfo;
 import ca.poc.uilogic.domain.wms.WmsTasksList;
 import ca.poc.uilogic.repository.interfaces.ITasksRepository;
 import ca.poc.uilogic.service.interfaces.ITasksService;
@@ -33,11 +37,17 @@ public class TasksService implements ITasksService {
 	private ITasksRepository tasksRepository;
 
 	@Value("${services.mode}")
-	private String mode;
+	private String mode = "real";
 
 	@Value("${wms.tasks.url}")
 	private String wmsUrl;
 
+	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
+	private static final String AUTHORIZATION_HEADER_VALUE = "Basic QWRtaW5pc3RyYXRvcjptYW5hZ2U=";
+
+	private static final String SEARCH_TASK_COMMAND = "/rest/pub/opentasksearch";
+	private static final String UPDATE_TASK_COMMAND = "/rest/pub/opentask/";
+	
 	@Inject
 	public TasksService(@Named("tasksRepository") ITasksRepository tasksRepository) {
 		this.tasksRepository = tasksRepository;
@@ -46,31 +56,7 @@ public class TasksService implements ITasksService {
 	@PostConstruct
 	private void init() {
 
-		if (mode != null && "real".equals(mode)) {
-
-			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.add("Authorization", "Basic QWRtaW5pc3RyYXRvcjptYW5hZ2U=");
-
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("includeTaskData", "true");
-
-			HttpEntity<Map<String, String>> request = new HttpEntity<Map<String, String>>(map, headers);
-
-			WmsTasksList result2 = restTemplate.postForObject(wmsUrl, request, WmsTasksList.class);
-
-			if (result2 != null) {
-				for (WmsTask wmsTask : result2.getTasksList()) {
-					if (wmsTask != null && wmsTask.getTaskInfo() != null && wmsTask.getTaskInfo().getName() != null && wmsTask.getTaskInfo().getName().length() > 0) {
-						tasksRepository.addTask(WmsTaskConverter.convert(wmsTask));
-					}
-				}
-			}
-
-		} else {
+		if (mode != null && !"real".equals(mode)) {
 
 			tasksRepository.addTask(new Task("Ekstra wpływ", "Taylor Hewitt", 1506592647877L, 1505204436546L, "Oczekujący", "", false, false, false));
 			tasksRepository.addTask(new Task("Ostatnia rata", "Lorraine Espinoza", 1505711506937L, 1506475453434L, "Oczekujący", "", false, true, false));
@@ -103,16 +89,79 @@ public class TasksService implements ITasksService {
 		}
 	}
 
-	public Task getTask(String id) {
-		return tasksRepository.getTask(id);
-	}
-
 	public long getTasksCount() {
-		return getAllTasks().size();
+		return getAllTasks(null).size();
 	}
 
-	public List<Task> getAllTasks() {
-		return tasksRepository.getTasks();
+	public void updateTaskOwner(String taskId, String operator) {
+
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+		String request = "{\"TaskInfo\":{\"assignedToList\":[\"" + operator + "\"]}}";
+		HttpEntity<String> requestEntityString = new HttpEntity<String>(request, getHeaders());
+
+		restTemplate.exchange(wmsUrl + UPDATE_TASK_COMMAND + taskId, HttpMethod.PUT, requestEntityString, WmsTaskInfo.class);
+	}
+
+	public List<Task> getAllTasks(String user) {
+
+		if (mode != null && !"real".equals(mode)) {
+
+			return tasksRepository.getTasks();
+			
+		} else {
+
+			RestTemplate restTemplate = new RestTemplate();
+			restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+	
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("includeTaskData", "true");
+	
+			HttpEntity<Map<String, String>> request = new HttpEntity<Map<String, String>>(map, getHeaders());
+	
+			WmsTasksList result = restTemplate.postForObject(wmsUrl + SEARCH_TASK_COMMAND, request, WmsTasksList.class);
+	
+			List<Task> tasks = new ArrayList<Task>();
+	
+			if (result != null) {
+				for (WmsTask wmsTask : result.getTasksList()) {
+					if (wmsTask.getTaskInfo().getTaskTypeID() != null && "26629648-BF99-D8E1-BDC6-AD91EC9AE268".equals(wmsTask.getTaskInfo().getTaskTypeID())) {
+						if (wmsTask != null && wmsTask.getTaskInfo() != null && wmsTask.getTaskInfo().getName() != null && wmsTask.getTaskInfo().getName().length() > 0) {
+							if (wmsTask.getTaskInfo().getAssignedToList() != null && wmsTask.getTaskInfo().getAssignedToList().length > 0) {
+								if (user == null || user.equals(wmsTask.getTaskInfo().getAssignedToList()[0])) {
+									tasks.add(WmsTaskConverter.convert(wmsTask));
+								}
+							}
+						}
+					}
+				}
+			}
+	
+			return tasks;
+		}
+	}
+
+	public Task getTask(String taskId) {
+		if (mode != null && !"real".equals(mode)) {
+			return tasksRepository.getTask(taskId);
+		} else {
+			List<Task> allTasks = getAllTasks(null);
+			for (Task task : allTasks) {
+				if (task != null && taskId.equals(task.getId())) {
+					return task;
+				}
+			}
+			return null;
+		}
+	}
+
+	public HttpHeaders getHeaders() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(AUTHORIZATION_HEADER_KEY, AUTHORIZATION_HEADER_VALUE);
+		return headers;
 	}
 
 	public List<Task> getUrgentTasks() {

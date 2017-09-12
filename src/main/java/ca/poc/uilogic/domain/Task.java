@@ -10,6 +10,7 @@ public class Task {
 	private String id;
 	private String title;
 	private String client;
+	private String operator;
 
 	private long setDate;
 	private long expirationDate;
@@ -143,5 +144,13 @@ public class Task {
 
 	public long getExpirationDate() {
 		return expirationDate;
+	}
+
+	public String getOperator() {
+		return operator;
+	}
+
+	public void setOperator(String operator) {
+		this.operator = operator;
 	}
 }

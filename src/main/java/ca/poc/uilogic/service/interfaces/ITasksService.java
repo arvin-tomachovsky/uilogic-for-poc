@@ -11,7 +11,9 @@ import ca.poc.uilogic.domain.Task;
  */
 public interface ITasksService {
 
-	List<Task> getAllTasks();
+	void updateTaskOwner(String taskId, String operator);
+
+	List<Task> getAllTasks(String user);
 
 	List<Task> getUrgentTasks();
 

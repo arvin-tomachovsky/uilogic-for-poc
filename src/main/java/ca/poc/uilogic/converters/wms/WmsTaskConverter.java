@@ -46,9 +46,12 @@ public class WmsTaskConverter {
 			result.setStatus(wmsTask.getTaskInfo().getStatus());
 		}
 		result.setTitle(wmsTask.getTaskInfo().getName());
+		if (wmsTask.getTaskInfo().getAssignedToList() != null && wmsTask.getTaskInfo().getAssignedToList().length > 0) {
+			result.setOperator(wmsTask.getTaskInfo().getAssignedToList()[0]);
+		}
 
-		result.setUrgent(Math.random() < 0.5);
-		result.setMyTask(Math.random() < 0.5);
+		result.setUrgent(wmsTask.getTaskInfo().getPriority() != null && "critical".equals(wmsTask.getTaskInfo().getPriority()));
+		result.setMyTask(false);
 		result.setRecurring(Math.random() < 0.5);
 
 		try {
