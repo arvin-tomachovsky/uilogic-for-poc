@@ -90,10 +90,10 @@ public class TasksController {
 		return tasksService.getAllTasks(null);
 	}
 
-	@RequestMapping(value = "/update/{taskId}/{operator}", method = RequestMethod.GET)
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
-	public void reassignTask(@PathVariable("taskId") String taskId, @PathVariable("operator") String operator) {
+	public void reassignTask() {
 		logger.debug("Rest controller has received request to update task");
-		tasksService.updateTaskOwner(taskId, operator);
+//		tasksService.updateTaskOwner(taskId, operator);
 	}
 }
