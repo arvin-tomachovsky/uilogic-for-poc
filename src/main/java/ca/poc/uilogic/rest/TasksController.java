@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.poc.uilogic.domain.Task;
+import ca.poc.uilogic.domain.UpdateTask;
 import ca.poc.uilogic.service.interfaces.ITasksService;
 
 /**
@@ -92,8 +94,15 @@ public class TasksController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
-	public void reassignTask() {
+	public void reassignTask(@RequestBody UpdateTask updateDetails) {
 		logger.debug("Rest controller has received request to update task");
-//		tasksService.updateTaskOwner(taskId, operator);
+		logger.error("### " + updateDetails.getUserId().getUser());
+		if (updateDetails != null && updateDetails.getUserId() != null && updateDetails.getUserId().getUser() != null && updateDetails.getUserId().getUser().length() > 0 && updateDetails.getUpdateTaskIds() != null && updateDetails.getUpdateTaskIds().getTasksId() != null) {
+			for (String taskId : updateDetails.getUpdateTaskIds().getTasksId()) {
+				if (taskId != null && taskId.length() > 0) {
+					tasksService.updateTaskOwner(taskId, updateDetails.getUserId().getUser());
+				}
+			}
+		}
 	}
 }
