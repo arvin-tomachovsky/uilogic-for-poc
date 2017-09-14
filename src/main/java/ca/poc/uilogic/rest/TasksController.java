@@ -54,7 +54,7 @@ public class TasksController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<Task> getAllTasks(@PathVariable("user") String user) {
 		logger.debug("Rest controller has received request to get all tasks for given user");
-		return tasksService.getAllTasks(user);
+		return tasksService.getAllTasks((user != null && "null".equals(user)) ? null : user);
 	}
 
 	@RequestMapping(value = "/{taskId}", method = RequestMethod.GET)
@@ -96,7 +96,6 @@ public class TasksController {
 	@ResponseStatus(HttpStatus.OK)
 	public void reassignTask(@RequestBody UpdateTask updateDetails) {
 		logger.debug("Rest controller has received request to update task");
-		logger.error("### " + updateDetails.getUserId().getUser());
 		if (updateDetails != null && updateDetails.getUserId() != null && updateDetails.getUserId().getUser() != null && updateDetails.getUserId().getUser().length() > 0 && updateDetails.getUpdateTaskIds() != null && updateDetails.getUpdateTaskIds().getTasksId() != null) {
 			for (String taskId : updateDetails.getUpdateTaskIds().getTasksId()) {
 				if (taskId != null && taskId.length() > 0) {

@@ -20,7 +20,7 @@ public class WmsTaskConverter {
 	/**
 	 * A conversion method.
 	 */
-	public static Task convert(WmsTask wmsTask) {
+	public static Task convert(WmsTask wmsTask, String user) {
 
 		if (wmsTask == null) {
 			return null;
@@ -48,6 +48,12 @@ public class WmsTaskConverter {
 		result.setTitle(wmsTask.getTaskInfo().getName());
 		if (wmsTask.getTaskInfo().getAssignedToList() != null && wmsTask.getTaskInfo().getAssignedToList().length > 0) {
 			result.setOperator(wmsTask.getTaskInfo().getAssignedToList()[0]);
+		}
+
+		if (user == null || "null".equals(user) || "dyrektor".equals(user)) {
+			result.setMyTask(result.getOperator().equals("dyrektor"));
+		} else {
+			result.setMyTask(result.getOperator().equals(user));
 		}
 
 		result.setUrgent(wmsTask.getTaskInfo().getPriority() != null && "critical".equals(wmsTask.getTaskInfo().getPriority()));

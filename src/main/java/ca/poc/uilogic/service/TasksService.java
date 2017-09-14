@@ -115,30 +115,30 @@ public class TasksService implements ITasksService {
 
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-	
+
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("includeTaskData", "true");
-	
+
 			HttpEntity<Map<String, String>> request = new HttpEntity<Map<String, String>>(map, getHeaders());
-	
+
 			WmsTasksList result = restTemplate.postForObject(wmsUrl + SEARCH_TASK_COMMAND, request, WmsTasksList.class);
-	
+
 			List<Task> tasks = new ArrayList<Task>();
-	
+
 			if (result != null) {
 				for (WmsTask wmsTask : result.getTasksList()) {
 					if (wmsTask.getTaskInfo().getTaskTypeID() != null && "26629648-BF99-D8E1-BDC6-AD91EC9AE268".equals(wmsTask.getTaskInfo().getTaskTypeID())) {
 						if (wmsTask != null && wmsTask.getTaskInfo() != null && wmsTask.getTaskInfo().getName() != null && wmsTask.getTaskInfo().getName().length() > 0) {
 							if (wmsTask.getTaskInfo().getAssignedToList() != null && wmsTask.getTaskInfo().getAssignedToList().length > 0) {
 								if (user == null || user == "null" || "dyrektor".equals(user) || user.equals(wmsTask.getTaskInfo().getAssignedToList()[0])) {
-									tasks.add(WmsTaskConverter.convert(wmsTask));
+									tasks.add(WmsTaskConverter.convert(wmsTask, user));
 								}
 							}
 						}
 					}
 				}
 			}
-	
+
 			return tasks;
 		}
 	}
