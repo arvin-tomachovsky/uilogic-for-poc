@@ -57,7 +57,6 @@ public class WmsTaskConverter {
 		}
 
 		result.setUrgent(wmsTask.getTaskInfo().getPriority() != null && "critical".equals(wmsTask.getTaskInfo().getPriority()));
-		result.setMyTask(false);
 		result.setRecurring(Math.random() < 0.5);
 
 		try {
