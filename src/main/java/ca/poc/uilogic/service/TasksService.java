@@ -110,7 +110,7 @@ public class TasksService implements ITasksService {
 		if (mode != null && !"real".equals(mode)) {
 
 			return tasksRepository.getTasks();
-			
+
 		} else {
 
 			RestTemplate restTemplate = new RestTemplate();
